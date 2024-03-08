@@ -52,9 +52,7 @@ contract LockupLinearCreateHandler is BaseHandler {
         useNewSender(params.sender)
     {
         // We don't want to create more than a certain number of streams.
-        if (lockupStore.lastStreamId() >= MAX_STREAM_COUNT) {
-            return;
-        }
+        vm.assume(lockupStore.lastStreamId() < MAX_STREAM_COUNT);
 
         // Bound the stream parameters.
         params.broker.fee = _bound(params.broker.fee, 0, MAX_BROKER_FEE);
@@ -88,9 +86,7 @@ contract LockupLinearCreateHandler is BaseHandler {
         useNewSender(params.sender)
     {
         // We don't want to create more than a certain number of streams.
-        if (lockupStore.lastStreamId() >= MAX_STREAM_COUNT) {
-            return;
-        }
+        vm.assume(lockupStore.lastStreamId() < MAX_STREAM_COUNT);
 
         uint40 currentTime = getBlockTimestamp();
         params.broker.fee = _bound(params.broker.fee, 0, MAX_BROKER_FEE);

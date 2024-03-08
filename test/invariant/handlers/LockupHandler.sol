@@ -121,15 +121,10 @@ abstract contract LockupHandler is BaseHandler {
         useFuzzedStreamSender
     {
         // Cold streams cannot be withdrawn from.
-        if (lockup.isCold(currentStreamId)) {
-            return;
-        }
+        vm.assume(!lockup.isCold(currentStreamId));
 
         // Not cancelable streams cannot be canceled.
-        bool isCancelable = lockup.isCancelable(currentStreamId);
-        if (!isCancelable) {
-            return;
-        }
+        vm.assume(lockup.isCancelable(currentStreamId));
 
         // Cancel the stream.
         lockup.cancel(currentStreamId);
@@ -146,15 +141,10 @@ abstract contract LockupHandler is BaseHandler {
         useFuzzedStreamSender
     {
         // Cold streams cannot be renounced.
-        if (lockup.isCold(currentStreamId)) {
-            return;
-        }
+        vm.assume(!lockup.isCold(currentStreamId));
 
         // Not cancelable streams cannot be renounced.
-        bool isCancelable = lockup.isCancelable(currentStreamId);
-        if (!isCancelable) {
-            return;
-        }
+        vm.assume(lockup.isCancelable(currentStreamId));
 
         // Renounce the stream (make it not cancelable).
         lockup.renounce(currentStreamId);
@@ -179,9 +169,7 @@ abstract contract LockupHandler is BaseHandler {
         }
 
         // The protocol doesn't allow the withdrawal address to be the zero address.
-        if (to == address(0)) {
-            return;
-        }
+        vm.assume(to != address(0));
 
         // The protocol doesn't allow zero withdrawal amounts.
         uint128 withdrawableAmount = lockup.withdrawableAmountOf(currentStreamId);
@@ -221,9 +209,7 @@ abstract contract LockupHandler is BaseHandler {
         }
 
         // The protocol doesn't allow the withdrawal address to be the zero address.
-        if (to == address(0)) {
-            return;
-        }
+        vm.assume(to != address(0));
 
         // The protocol doesn't allow a zero amount to be withdrawn.
         uint128 withdrawableAmount = lockup.withdrawableAmountOf(currentStreamId);
@@ -260,25 +246,16 @@ abstract contract LockupHandler is BaseHandler {
         }
 
         // OpenZeppelin's ERC-721 implementation doesn't allow the new recipient to be the zero address.
-        if (newRecipient == address(0)) {
-            return;
-        }
+        vm.assume(newRecipient != address(0));
 
         // Skip burned NFTs.
-        if (currentRecipient == address(0)) {
-            return;
-        }
+        vm.assume(currentRecipient != address(0));
 
         // Skip if the stream is not transferable.
-        if (!lockup.isTransferable(currentStreamId)) {
-            return;
-        }
+        vm.assume(lockup.isTransferable(currentStreamId));
 
         // The protocol doesn't allow a zero amount to be withdrawn.
-        uint128 withdrawableAmount = lockup.withdrawableAmountOf(currentStreamId);
-        if (withdrawableAmount == 0) {
-            return;
-        }
+        vm.assume(lockup.withdrawableAmountOf(currentStreamId) > 0);
 
         // Make the max withdrawal and transfer the NFT.
         lockup.withdrawMaxAndTransfer({ streamId: currentStreamId, newRecipient: newRecipient });
@@ -303,19 +280,13 @@ abstract contract LockupHandler is BaseHandler {
         useFuzzedStreamRecipient
     {
         // OpenZeppelin's ERC-721 implementation doesn't allow the new recipient to be the zero address.
-        if (newRecipient == address(0)) {
-            return;
-        }
+        vm.assume(newRecipient != address(0));
 
         // Skip burned NFTs.
-        if (currentRecipient == address(0)) {
-            return;
-        }
+        vm.assume(currentRecipient != address(0));
 
         // Skip if the stream is not transferable.
-        if (!lockup.isTransferable(currentStreamId)) {
-            return;
-        }
+        vm.assume(lockup.isTransferable(currentStreamId));
 
         // Transfer the NFT to the new recipient.
         lockup.transferFrom({ from: currentRecipient, to: newRecipient, tokenId: currentStreamId });
